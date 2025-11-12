@@ -1,0 +1,287 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MoreSore Fitness Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white min-h-screen">
+
+  <!-- Navigation Bar -->
+  <nav class="bg-black text-white py-4 px-6 mb-8">
+    <div class="max-w-7xl mx-auto">
+      <ul class="flex justify-center space-x-8">
+        <li><a href="{% url 'home' %}" class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">Home</a></li>
+        <li><a href="#" class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">Profile</a></li>
+        <li><a href="#" class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">Social</a></li>
+        <li><a href="{% url 'progress' %}" class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">Progress</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-6 pb-12">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+      <!-- Today's Workouts -->
+      <article class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-4 text-black">Today's Workouts</h2>
+
+        {% if workouts %}
+          {% for workout in workouts %}
+            <div class="mb-4 pb-4 border-b border-gray-200 last:border-b-0">
+              <h3 class="text-xl font-semibold mb-2 text-black">{{ workout.name }}</h3>
+              <ul class="space-y-2">
+                {% for we in workout.workoutexercise_set.all %}
+                  <li class="flex justify-between items-center text-gray-700">
+                    <span class="font-medium">{{ we.exercise.name }}</span>
+                    <span class="text-sm">{{ we.sets }} sets × {{ we.reps }} reps</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-gray-500">No workouts logged yet for today.</p>
+        {% endif %}
+      </article>
+
+      <!-- Pump Pics -->
+      <article class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-4 text-black">Pump Pics</h2>
+
+        <!-- Upload Form -->
+        <form
+          method="post"
+          enctype="multipart/form-data"
+          action="{% url 'upload_picture' %}"
+          class="mb-4 flex items-center justify-between gap-3"
+        >
+          {% csrf_token %}
+          <label
+            for="pictureInput"
+            class="bg-black text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-800 cursor-pointer transition-colors"
+          >
+            📸 Add Picture
+          </label>
+          <!--
+            accept="image/*" lets user select from gallery
+            capture="environment" opens the phone’s rear camera directly
+          -->
+          <input
+            id="pictureInput"
+            type="file"
+            name="image"
+            accept="image/*"
+            capture="environment"
+            class="hidden"
+            onchange="this.form.submit()"
+          />
+        </form>
+
+        <!-- Display Uploaded Pics -->
+        {% if pictures %}
+          <div class="grid grid-cols-3 gap-4">
+            {% for pic in pictures %}
+              <div class="relative group">
+                <img
+                  src="{{ pic.image.url }}"
+                  alt="Pump Pic"
+                  class="w-full h-32 object-cover rounded-lg border-2 border-gray-300"
+                />
+                <form
+                  method="post"
+                  action="{% url 'delete_picture' pic.id %}"
+                  class="absolute top-2 right-2 hidden group-hover:block"
+                >
+                  {% csrf_token %}
+                  <button
+                    type="submit"
+                    class="bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700 transition-colors"
+                    onclick="return confirm('Delete this picture?')"
+                  >
+                   Delete
+                  </button>
+                </form>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-gray-500">No pump pics uploaded yet.</p>
+        {% endif %}
+      </article>
+
+      <!-- Today's Meals -->
+      <article class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-4 text-black">Today's Meals</h2>
+
+        {% if meals %}
+          {% for meal in meals %}
+            <div class="mb-4 pb-4 border-b border-gray-200 last:border-b-0">
+              <h3 class="text-xl font-semibold mb-2 text-black">{{ meal.name }}</h3>
+              <div class="grid grid-cols-4 gap-2 text-sm text-gray-700">
+                <div class="text-center">
+                  <p class="font-bold text-black">{{ meal.calories }}</p>
+                  <p class="text-xs text-gray-500">cal</p>
+                </div>
+                <div class="text-center">
+                  <p class="font-bold text-black">{{ meal.protein }}g</p>
+                  <p class="text-xs text-gray-500">protein</p>
+                </div>
+                <div class="text-center">
+                  <p class="font-bold text-black">{{ meal.carbs }}g</p>
+                  <p class="text-xs text-gray-500">carbs</p>
+                </div>
+                <div class="text-center">
+                  <p class="font-bold text-black">{{ meal.fats }}g</p>
+                  <p class="text-xs text-gray-500">fats</p>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-gray-500">No meals logged for today.</p>
+        {% endif %}
+      </article>
+
+      <!-- Daily Totals -->
+      <article class="bg-black text-white rounded-xl shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Today's Totals</h2>
+        <div class="space-y-3 text-right">
+          <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+            <span class="text-lg">Total Calories:</span>
+            <span class="text-2xl font-bold">{{ daily_log.total_calories|default:"0" }}</span>
+          </div>
+          <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+            <span class="text-lg">Protein:</span>
+            <span class="text-2xl font-bold">{{ daily_log.total_protein|default:"0" }}g</span>
+          </div>
+          <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+            <span class="text-lg">Carbs:</span>
+            <span class="text-2xl font-bold">{{ daily_log.total_carbs|default:"0" }}g</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-lg">Fats:</span>
+            <span class="text-2xl font-bold">{{ daily_log.total_fats|default:"0" }}g</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    {% if staged_workout %}
+    <article class="bg-yellow-50 border-2 border-yellow-400 rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-2xl font-bold mb-4 text-yellow-900">AI-Generated Workout Preview</h2>
+      <form id="saveWorkoutForm" method="post" action="{% url 'finalize_staged_workout' %}">
+        {% csrf_token %}
+        <input type="hidden" name="workout_name" value="{{ staged_workout.workout_name }}">
+        <div class="space-y-4">
+          {% for ex in staged_workout.exercises %}
+          <div class="bg-white p-4 border rounded-lg">
+            <h3 class="font-semibold mb-2 text-black">{{ ex.name }}</h3>
+            <div class="grid grid-cols-4 gap-2 text-sm">
+              <label>Sets <input type="number" name="sets_{{ forloop.counter }}" value="{{ ex.sets }}" class="border px-2 py-1 rounded w-full"></label>
+              <label>Reps <input type="number" name="reps_{{ forloop.counter }}" value="{{ ex.reps }}" class="border px-2 py-1 rounded w-full"></label>
+              <label>Weight <input type="number" name="weight_{{ forloop.counter }}" value="{{ ex.weight }}" class="border px-2 py-1 rounded w-full"></label>
+              <label>Notes <input type="text" name="notes_{{ forloop.counter }}" value="{{ ex.notes }}" class="border px-2 py-1 rounded w-full"></label>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="mt-4 flex justify-end gap-3">
+          <button type="submit" class="bg-black text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-800">Save Workout</button>
+          <a href="{% url 'discard_staged_workout' %}" class="text-red-600 hover:underline">Discard</a>
+        </div>
+      </form>
+    </article>
+    {% endif %}
+
+    <!-- Chatbot -->
+    <article class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold mb-4 text-black">Chatbot</h2>
+
+      <div id="chatResponse" class="mb-4 p-4 bg-gray-50 rounded-lg min-h-[100px] hidden">
+        <p class="text-gray-700"></p>
+      </div>
+
+      <div class="flex gap-3">
+        <input
+          type="text"
+          id="chatInput"
+          placeholder="Ask me anything…"
+          class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors"
+        />
+        <button
+          id="sendButton"
+          class="px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+        >
+          Send
+        </button>
+      </div>
+    </article>
+  </main>
+
+  <!-- Chatbot Script -->
+  <script>
+    function getCookie(name) {
+      const match = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+      return match ? match.pop() : '';
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    const chatInput = document.getElementById('chatInput');
+    const sendButton = document.getElementById('sendButton');
+    const chatResponse = document.getElementById('chatResponse');
+
+    async function sendMessage() {
+      const userMessage = chatInput.value.trim();
+      if (!userMessage) return;
+
+      chatInput.disabled = true;
+      sendButton.disabled = true;
+      sendButton.textContent = 'Sending...';
+
+      chatResponse.classList.remove('hidden');
+      chatResponse.querySelector('p').textContent = 'Thinking...';
+
+      try {
+        const response = await fetch("{% url 'trigger_agent' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+          },
+          body: JSON.stringify({
+            input: userMessage,
+            user_id: {{ request.user.id }}
+          })
+        });
+
+        const data = await response.json();
+        const msg = data.response || data.message || data.n8n_response || 'Response received!';
+        chatResponse.querySelector('p').textContent = msg;
+        chatInput.value = '';
+
+        if (response.ok) {
+          setTimeout(() => location.reload(), 3000);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        chatResponse.querySelector('p').textContent =
+          'Sorry, there was an error processing your request.';
+      } finally {
+        chatInput.disabled = false;
+        sendButton.disabled = false;
+        sendButton.textContent = 'Send';
+        chatInput.focus();
+      }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  </script>
+</body>
+</html>

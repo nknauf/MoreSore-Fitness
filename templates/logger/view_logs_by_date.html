@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View Logs by Date</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-black text-white py-4 px-6 mb-8">
+    <div class="max-w-7xl mx-auto">
+      <ul class="flex justify-center space-x-8">
+        <li><a href="{% url 'home' %}" class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">Home</a></li>
+        <li><a href="#" class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">Profile</a></li>
+        <li><a href="#" class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">Social</a></li>
+        <li><a href="#" class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">Progress</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="max-w-7xl mx-auto px-6 pb-12 space-y-8">
+
+    <!-- Date Picker -->
+    <article class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold mb-4 text-black">View Meals & Workouts by Date</h2>
+      <form method="get" class="flex flex-wrap items-center gap-4">
+        <input type="date" name="date" value="{{ selected_date }}" class="border-2 border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:border-black" />
+        <button type="submit" class="bg-black text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-800 transition-colors">View</button>
+      </form>
+    </article>
+
+    <!-- Meals -->
+    <article class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold mb-4 text-black">Meals Logged on {{ selected_date }}</h2>
+
+      {% if meals %}
+        <div class="divide-y divide-gray-200">
+          {% for meal in meals %}
+            <div class="py-4">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h3 class="text-xl font-semibold text-black">{{ meal.name }}</h3>
+                  <p class="text-gray-600 text-sm">
+                    {{ meal.calories }} cal — {{ meal.protein }}g protein, {{ meal.carbs }}g carbs, {{ meal.fats }}g fats
+                  </p>
+                </div>
+                <div class="flex gap-3">
+                  <form method="get" action="{% url 'edit_meal_log' meal.id %}">
+                    <button type="submit" class="px-3 py-1 border border-black rounded-lg hover:bg-black hover:text-white transition-colors text-sm">Edit</button>
+                  </form>
+                  <form method="post" action="{% url 'delete_meal_log' meal.id %}">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Delete this meal?')" class="px-3 py-1 border border-red-600 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors text-sm">Delete</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="mt-6 border-t border-gray-300 pt-4 text-right text-lg text-black">
+          <p><strong>Total Calories:</strong> {{ total_calories }}</p>
+          <p><strong>Total Protein:</strong> {{ total_protein }}g</p>
+          <p><strong>Total Carbs:</strong> {{ total_carbs }}g</p>
+          <p><strong>Total Fats:</strong> {{ total_fats }}g</p>
+        </div>
+      {% else %}
+        <p class="text-gray-500">No meals logged for this date.</p>
+      {% endif %}
+    </article>
+
+    <!-- Workouts -->
+    <article class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold mb-4 text-black">Workouts on {{ selected_date }}</h2>
+
+      {% if workouts %}
+        {% for workout in workouts %}
+          <div class="mb-6 border-b border-gray-200 pb-4">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-xl font-semibold text-black">{{ workout.name }}</h3>
+                <p class="text-gray-600 text-sm">Created: {{ workout.created_at|date:"g:i A" }}</p>
+              </div>
+              <div class="flex gap-3">
+                <form method="get" action="{% url 'edit_workout' workout.id %}">
+                  <button type="submit" class="px-3 py-1 border border-black rounded-lg hover:bg-black hover:text-white transition-colors text-sm">Edit</button>
+                </form>
+                <form method="post" action="{% url 'delete_workout' workout.id %}">
+                  {% csrf_token %}
+                  <button type="submit" onclick="return confirm('Delete this workout?')" class="px-3 py-1 border border-red-600 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors text-sm">Delete</button>
+                </form>
+              </div>
+            </div>
+
+            {% if workout.workoutexercise_set.all %}
+              <ul class="mt-4 bg-gray-50 rounded-lg p-4 space-y-2">
+                {% for we in workout.workoutexercise_set.all %}
+                  <li class="flex justify-between text-gray-700">
+                    <span>{{ we.exercise.name }}</span>
+                    <span class="text-sm">{{ we.sets }} sets × {{ we.reps }} reps</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-gray-500">No workouts found for this date.</p>
+      {% endif %}
+    </article>
+
+    <!-- Navigation Buttons -->
+    <div class="flex justify-center gap-6 mt-8">
+      <a href="{% url 'home' %}" class="px-6 py-3 border-2 border-black text-black rounded-lg font-semibold hover:bg-black hover:text-white transition-colors">← Back to Home</a>
+    </div>
+  </main>
+</body>
+</html>
