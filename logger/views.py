@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST
+from django.utils import timezone
 
 
 from datetime import date
@@ -14,7 +15,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import MuscleGroup, Equipment, Exercise, DailyLog, Workout, WorkoutExercise, UserProfile, ExerciseProgress, StageWorkout, Picture
+from .models import MuscleGroup, Equipment, Exercise, DailyLog, Workout, WorkoutExercise, UserProfile, ExerciseProgress, StageWorkout, Picture, MealEntry
 from .serializers import WorkoutSerializer, AIWorkoutCreateSerializer, AIMealCreateSerializer, MealEntrySerializer
 from .utils import update_exercise_progress
 
@@ -27,7 +28,7 @@ MEAL_AGENT_URL = 'http://143.198.113.171:5678/webhook/meal-agent'
 def home(request):
     daily_log, _ = DailyLog.objects.get_or_create(
         user=request.user,
-        date=date.today()
+        date=timezone.localdate()
     )
     workouts = daily_log.workouts.all().order_by('-date', '-created_at')
     meals = daily_log.meals.all().order_by('-date', '-created_at')
@@ -71,6 +72,10 @@ def trigger_agent(request):
         if not user_input:
             return Response({"error": "Input is required"}, status=400)
         
+        input_date = request.data.get('date')
+        if not input_date:
+            input_date = timezone.localdate().isoformat()
+        
         workout_keywords = ["workout", "sets", "reps", "bench", "curl", "press", "squat"]
         meal_keywords = ["meal", "calorie", "calories", "cals", "protein", "breakfast", "lunch", "dinner", "food", "snack"]
 
@@ -87,6 +92,7 @@ def trigger_agent(request):
         payload = {
             'input': user_input,
             'user_id': user_id,
+            'date': input_date,
             'callback_url': f"https://manlike-dextrously-aracely.ngrok-free.dev/api/create-{agent_type}-from-agent/"
         }
         
@@ -123,9 +129,15 @@ def create_workout_from_agent(request):
         serializer = AIWorkoutCreateSerializer(data=workout_data)
         if serializer.is_valid():
             workout = serializer.save()
+            
+            # workout_date = timezone.localdate()
+            # invalid_dates = {None, date(1900,1,1), date(2024,1,1)}
+            # if workout.date not in invalid_dates:
+            #     workout_date = workout.date
+
             daily_log, created = DailyLog.objects.get_or_create(
                 user=workout.user, 
-                date=date.today(),
+                date=workout.date,
             )
             daily_log.workouts.add(workout)
             workout_serialized = WorkoutSerializer(workout)
@@ -142,12 +154,11 @@ def finalize_staged_workout(request):
     staged = StageWorkout.objects.filter(user=request.user).first()
     if not staged:
         return redirect('home')
-
     data = staged.data
     serializer = AIWorkoutCreateSerializer(data=data)
     if serializer.is_valid():
         workout = serializer.save()
-        daily_log, _ = DailyLog.objects.get_or_create(user=request.user, date=date.today())
+        daily_log, _ = DailyLog.objects.get_or_create(user=request.user, date=timezone.localdate())
         daily_log.workouts.add(workout)
         staged.delete()
         return redirect('home')
@@ -170,6 +181,12 @@ def create_meal_from_agent(request):
         serializer = AIMealCreateSerializer(data=meal_data)
         if serializer.is_valid():
             meal = serializer.save()
+
+            # meal_date = timezone.localdate()
+            # invalid_dates = {None, date(1900,1,1), date(2024,1,1)}
+            # if meal.date not in invalid_dates:
+            #     meal_date = meal.date
+
             daily_log, _ = DailyLog.objects.get_or_create(
                 user=meal.user, 
                 date=meal.date
@@ -197,12 +214,46 @@ def get_recent_workouts(request):
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, 
                       status=status.HTTP_404_NOT_FOUND)
+    
 
+@login_required
+def delete_workout(request, workout_id):
+    """
+    Delete workout function and removes it from the user's daily_log
+    """
+    workout = get_object_or_404(Workout, id=workout_id, user=request.user)
+    daily_log = DailyLog.objects.filter(
+        user=request.user,
+        date=workout.date
+    ).first()
+    
+    if daily_log:
+        daily_log.workouts.remove(workout)
 
+    workout.delete()
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+@login_required
+def delete_meal(request, meal_id):
+    """
+    Delete meal function and removes it from daily log
+    """
+    meal = get_object_or_404(MealEntry, id=meal_id, user=request.user)
+    daily_log = DailyLog.objects.filter(
+        user=request.user,
+        date=meal.date
+    ).first()
+
+    if daily_log:
+        daily_log.meals.remove(meal)
+    meal.delete()
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+    
 # @login_required
 # def view_logs_by_date(request):
 #     """Display meals and workouts for a given date."""
-#     selected_date = request.GET.get("date", date.today().isoformat())
+#     selected_date = request.GET.get("date", timezone.localdate().isoformat())
 
 #     # Fetch or create daily log
 #     daily_log = DailyLog.objects.filter(user=request.user, date=selected_date).first()
@@ -236,7 +287,7 @@ def progress(request):
     from datetime import date
 
     # --- 1. Handle date picker for daily logs ---
-    selected_date = request.GET.get("date", date.today().isoformat())
+    selected_date = request.GET.get("date", timezone.localdate().isoformat())
     daily_log = DailyLog.objects.filter(user=request.user, date=selected_date).first()
 
     meals = daily_log.meals.all() if daily_log else []

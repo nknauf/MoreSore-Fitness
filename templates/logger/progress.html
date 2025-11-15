@@ -43,6 +43,18 @@
           <div class="py-4 flex justify-between items-center">
             <div>
               <h3 class="text-xl font-semibold text-black">{{ meal.name }}</h3>
+
+              <form method="post" action="{% url 'delete_meal' meal.id %}" class="mt-2">
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  onclick="return confirm('Delete this meal entry?')"
+                  class="text-red-600 text-sm hover:underline"
+                >
+                  Delete Meal
+                </button>
+              </form>
+
               <p class="text-gray-600 text-sm">
                 {{ meal.calories }} cal — {{ meal.protein }}g protein, {{ meal.carbs }}g carbs, {{ meal.fats }}g fats
               </p>
@@ -69,6 +81,18 @@
         {% for workout in workouts %}
           <div class="mb-6 border-b border-gray-200 pb-4">
             <h3 class="text-xl font-semibold text-black">{{ workout.name }}</h3>
+
+            <form method="post" action="{% url 'delete_workout' workout.id %}" class="mt-2">
+              {% csrf_token %}
+              <button
+                type="submit"
+                onclick="return confirm('Delete this workout?')"
+                class="text-red-600 text-sm hover:underline"
+              >
+                Delete Workout
+              </button>
+            </form>
+
             <p class="text-gray-600 text-sm">Created: {{ workout.created_at|date:"g:i A" }}</p>
             {% if workout.workoutexercise_set.all %}
               <ul class="mt-4 bg-gray-50 rounded-lg p-4 space-y-2">

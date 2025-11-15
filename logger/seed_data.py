@@ -11,7 +11,7 @@ def run():
     # 1. Create BaseMuscle & Muscles
     base_muscles_data = [
         {"name": "Chest", "muscles": ["UpperChest", "MidChest", "LowerChest"]},
-        {"name": "Back", "muscles": ["UpperBack", "Lats", "LowerBack", "Traps"]},
+        {"name": "Back", "muscles": ["UpperBack", "Lats", "LowerBack"]},
         {"name": "Shoulders", "muscles": ["FrontDelt", "SideDelt", "RearDelt"]},
         {"name": "Arms", "muscles": ["Biceps", "Triceps", "Forearms"]},
         {"name": "Legs", "muscles": ["Quads", "Hamstrings", "Glutes", "Calves", "Adductors", "Abductors"]},
@@ -191,7 +191,7 @@ def run():
         },
         {
         "name": "Shrug",
-        "primary_muscle_group": "Traps",
+        "primary_muscle_group": "Back",
         "secondary_muscle_groups": ["UpperBack"],
         "exercises": [
             {"name": "Barbell Shrug", "base_exercise": "Shrug", "equipment": "Barbell"},

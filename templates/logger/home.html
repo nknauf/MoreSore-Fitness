@@ -33,6 +33,18 @@
           {% for workout in workouts %}
             <div class="mb-4 pb-4 border-b border-gray-200 last:border-b-0">
               <h3 class="text-xl font-semibold mb-2 text-black">{{ workout.name }}</h3>
+
+              <form method="post" action="{% url 'delete_workout' workout.id %}" class="mt-2">
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  onclick="return confirm('Delete this workout?')"
+                  class="text-red-600 text-sm hover:underline"
+                >
+                  Delete Workout
+                </button>
+              </form>
+
               <ul class="space-y-2">
                 {% for we in workout.workoutexercise_set.all %}
                   <li class="flex justify-between items-center text-gray-700">
@@ -121,6 +133,18 @@
           {% for meal in meals %}
             <div class="mb-4 pb-4 border-b border-gray-200 last:border-b-0">
               <h3 class="text-xl font-semibold mb-2 text-black">{{ meal.name }}</h3>
+
+              <form method="post" action="{% url 'delete_meal' meal.id %}" class="mt-2">
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  onclick="return confirm('Delete this meal entry?')"
+                  class="text-red-600 text-sm hover:underline"
+                >
+                  Delete Meal
+                </button>
+              </form>
+
               <div class="grid grid-cols-4 gap-2 text-sm text-gray-700">
                 <div class="text-center">
                   <p class="font-bold text-black">{{ meal.calories }}</p>
@@ -170,7 +194,7 @@
       </article>
     </div>
 
-    {% if staged_workout %}
+    <!-- {% if staged_workout %}
     <article class="bg-yellow-50 border-2 border-yellow-400 rounded-xl shadow-lg p-6 mb-6">
       <h2 class="text-2xl font-bold mb-4 text-yellow-900">AI-Generated Workout Preview</h2>
       <form id="saveWorkoutForm" method="post" action="{% url 'finalize_staged_workout' %}">
@@ -195,7 +219,7 @@
         </div>
       </form>
     </article>
-    {% endif %}
+    {% endif %} -->
 
     <!-- Chatbot -->
     <article class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
@@ -205,13 +229,16 @@
         <p class="text-gray-700"></p>
       </div>
 
-      <div class="flex gap-3">
-        <input
-          type="text"
+      <div class="flex gap-3 items-start">
+        <textarea
           id="chatInput"
-          placeholder="Ask me anything…"
-          class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors"
-        />
+          rows="5"
+          placeholder="• Track your reps, sets, and max weights per exercise during the lift in your notes and then paste the entire thing in here
+• Tell the AI about the name of the food as well as calories, protein, carbs, fats
+• Add any personal notes to either workout or meals
+• Give each workout and meal a name so the AI knows what to refer to"
+          class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-black transition-colors resize-none leading-relaxed"
+        ></textarea>
         <button
           id="sendButton"
           class="px-6 py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors"
@@ -233,10 +260,16 @@
     const chatInput = document.getElementById('chatInput');
     const sendButton = document.getElementById('sendButton');
     const chatResponse = document.getElementById('chatResponse');
+    chatInput.addEventListener('input', () => {
+      chatInput.style.height = 'auto';
+      chatInput.style.height = chatInput.scrollHeight + 'px';
+    });
 
     async function sendMessage() {
       const userMessage = chatInput.value.trim();
       if (!userMessage) return;
+
+      const localDate = new Date().toISOString().slice(0, 10);
 
       chatInput.disabled = true;
       sendButton.disabled = true;
@@ -254,7 +287,8 @@
           },
           body: JSON.stringify({
             input: userMessage,
-            user_id: {{ request.user.id }}
+            user_id: {{ request.user.id }},
+            date: localDate
           })
         });
 
@@ -279,8 +313,11 @@
     }
 
     sendButton.addEventListener('click', sendMessage);
-    chatInput.addEventListener('keypress', e => {
-      if (e.key === 'Enter') sendMessage();
+    chatInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
     });
   </script>
 </body>

@@ -11,6 +11,8 @@ urlpatterns = [
     path('api/recent-workouts/', views.get_recent_workouts, name='get_recent_workouts'),
     path('progress/', views.progress, name='progress'),
     path('upload-picture/', views.upload_picture, name='upload_picture'),
-    path('delete-picture/<int:pic_id>/', views.delete_picture, name='delete_picture')
+    path('delete-picture/<int:pic_id>/', views.delete_picture, name='delete_picture'),
+    path('delete/workout/<int:workout_id>/', views.delete_workout, name='delete_workout'),
+    path('delete/meal/<int:meal_id>/', views.delete_meal, name='delete_meal'),
     
 ]   + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
