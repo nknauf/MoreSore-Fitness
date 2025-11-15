@@ -26,7 +26,12 @@ SECRET_KEY = 'django-insecure-i4a%&(=x6yill+!mmgd+n=f!22!o46+#4)jr4q(s5q@$$fntni
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "manlike-dextrously-aracely.ngrok-free.dev"]
+ALLOWED_HOSTS = ["127.0.0.1", 
+                 "localhost", 
+                 "manlike-dextrously-aracely.ngrok-free.dev",
+                 "143.198.113.171",
+                 "moresorefitness.com",
+                 "www.moresorefitness.com"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://manlike-dextrously-aracely.ngrok-free.dev",
