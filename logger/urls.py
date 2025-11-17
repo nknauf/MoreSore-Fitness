@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('register/', views.register, name='register'),
     path('', views.home, name='home'),
     path('api/trigger-agent/', views.trigger_agent, name='trigger_agent'),
     path('api/create-workout-from-agent/', views.create_workout_from_agent, name='create_workout_from_agent'),

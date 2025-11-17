@@ -5,6 +5,8 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST
 from django.utils import timezone
+from django.contrib import messages
+from django.contrib.auth import login
 
 
 from datetime import date
@@ -18,11 +20,25 @@ from rest_framework import status
 from .models import MuscleGroup, Equipment, Exercise, DailyLog, Workout, WorkoutExercise, UserProfile, ExerciseProgress, StageWorkout, Picture, MealEntry
 from .serializers import WorkoutSerializer, AIWorkoutCreateSerializer, AIMealCreateSerializer, MealEntrySerializer
 from .utils import update_exercise_progress
+from .forms import RegisterForm
 
 
 WORKOUT_AGENT_URL = 'http://143.198.113.171:5678/webhook/workout-agent'
 MEAL_AGENT_URL = 'http://143.198.113.171:5678/webhook/meal-agent'
 
+
+def register(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # automatically log in new user
+            messages.success(request, "Account created successfully!")
+            return redirect('home')  # redirect to dashboard
+    else:
+        form = RegisterForm()
+
+    return render(request, 'logger/register.html', {'form': form})
 
 @login_required
 def home(request):
