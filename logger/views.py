@@ -109,7 +109,7 @@ def trigger_agent(request):
             'input': user_input,
             'user_id': user_id,
             'date': input_date,
-            'callback_url': f"http://143.198.113.171:5678/api/create-{agent_type}-from-agent/"
+            'callback_url': f"http://www.moresore.com/api/create-{agent_type}-from-agent/"
         }
         
         # Test 3: Try the network request with detailed error info
