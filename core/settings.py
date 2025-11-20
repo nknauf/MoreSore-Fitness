@@ -30,8 +30,8 @@ ALLOWED_HOSTS = ["127.0.0.1",
                  "localhost", 
                  "manlike-dextrously-aracely.ngrok-free.dev",
                  "143.198.113.171",
-                 "moresorefitness.com",
-                 "www.moresorefitness.com"]
+                 "moresore.com",
+                 "www.moresore.com"]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://manlike-dextrously-aracely.ngrok-free.dev",
