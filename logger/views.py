@@ -355,3 +355,8 @@ def progress(request):
     }
 
     return render(request, "logger/progress.html", context)
+
+
+@login_required
+def about(request):
+    return render(request, "logger/about.html")

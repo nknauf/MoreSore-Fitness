@@ -1,0 +1,345 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Me | MoreSore Fitness</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-black text-white py-4 px-6 mb-8">
+    <div class="max-w-7xl mx-auto">
+      <ul class="flex justify-center space-x-8">
+        <li>
+          <a href="{% url 'home' %}"
+             class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">
+            Home
+          </a>
+        </li>
+        <li>
+          <a href="#project"
+             class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">
+            Project
+          </a>
+        </li>
+        <li>
+          <a href="#architecture"
+             class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">
+            Architecture
+          </a>
+        </li>
+        <li>
+          <a href="#future"
+             class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">
+            Future
+          </a>
+        </li>
+        <li>
+          <a href="#contact"
+             class="px-6 py-2 rounded-full border-2 border-white hover:bg-white hover:text-black transition-colors">
+            Contact
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-6 pb-16 space-y-10">
+
+    <!-- HERO / INTRO -->
+    <section class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+      <div class="flex flex-col lg:flex-row gap-6 items-start lg:items-center">
+        <div class="flex-1">
+          <p class="text-sm uppercase tracking-widest text-gray-500 mb-2">
+            About Me
+          </p>
+          <h1 class="text-3xl md:text-4xl font-bold text-black mb-4">
+            Hi, I’m Noah — a Computer Engineering student building an AI-powered fitness platform.
+          </h1>
+          <p class="text-gray-700 leading-relaxed mb-3">
+            I’m a junior in Computer Engineering at Virginia Tech with a focus on systems, signal processing, and applied AI.
+            MoreSore Fitness is my end-to-end project: a production-deployed, multi-platform web application
+            that combines <span class="font-semibold">Django</span>, <span class="font-semibold">n8n automation</span>,
+            <span class="font-semibold">LLM agents</span>, and <span class="font-semibold">custom workout analytics</span>.
+          </p>
+          <p class="text-gray-700 leading-relaxed">
+            My goal is to build systems that connect software, data, and eventually hardware (sensors / wearables)
+            to help people train smarter, not just harder.
+          </p>
+        </div>
+
+        <!-- PROFILE IMAGE -->
+        <div class="w-full max-w-xs lg:w-64">
+          <img
+            src="{% static 'moresore-fitness/more_sore_about1.jpeg' %}"
+            alt="Noah Knauf - MoreSore Fitness"
+            class="w-full h-64 object-cover rounded-xl border-2 border-black shadow-md"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECT OVERVIEW -->
+    <section id="project" class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-black mb-4">MoreSore Fitness — Project Overview</h2>
+
+      <p class="text-gray-700 leading-relaxed mb-4">
+        MoreSore Fitness is a full-stack web application where users can:
+      </p>
+
+      <ul class="list-disc list-inside text-gray-700 space-y-1 mb-4">
+        <li>Log workouts with detailed exercise data (sets, reps, weight, rest, notes).</li>
+        <li>Log meals and daily macros (calories, protein, carbs, fats).</li>
+        <li>Use an AI agent to automatically generate structured workouts and meal entries from natural language.</li>
+        <li>Track progress over time for specific exercises using custom analytics (volume, 1RM estimates, average weight).</li>
+        <li>Upload “pump pics” to visually track physical progress.</li>
+      </ul>
+
+      <p class="text-gray-700 leading-relaxed">
+        Under the hood, it’s driven by Django models and serializers that enforce structure on AI outputs,
+        a DigitalOcean droplet running Gunicorn + Nginx, and an n8n workflow that orchestrates LLM calls and
+        callback APIs back into my application.
+      </p>
+    </section>
+
+    <!-- ARCHITECTURE / DIAGRAM -->
+    <section id="architecture" class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-black mb-4">System Architecture</h2>
+
+      <p class="text-gray-700 leading-relaxed mb-4">
+        The platform is designed as a set of cooperating services:
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-800">
+          <h3 class="font-semibold text-black mb-2">High-Level Flow</h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>User interacts with a Django-rendered dashboard and chatbot.</li>
+            <li>Chatbot sends a request to an <span class="font-semibold">n8n AI agent</span>.</li>
+            <li>n8n calls an LLM API (e.g., Gemini) and parses the response into clean JSON.</li>
+            <li>n8n POSTs the structured data back to Django via a callback URL.</li>
+            <li>Django serializers validate, normalize, and save the data to Postgres/SQLite.</li>
+            <li>Updated workouts and meals appear on the user’s dashboard and progress views.</li>
+          </ul>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-800">
+          <h3 class="font-semibold text-black mb-2">Tech Stack</h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li><span class="font-semibold">Backend:</span> Django, Django REST Framework, Python.</li>
+            <li><span class="font-semibold">Automation:</span> n8n workflow for LLM orchestration and callbacks.</li>
+            <li><span class="font-semibold">Frontend:</span> Django templates + Tailwind CSS.</li>
+            <li><span class="font-semibold">Database:</span> Django ORM (SQLite / Postgres-ready models).</li>
+            <li><span class="font-semibold">Deployment:</span> DigitalOcean droplet, Gunicorn, Nginx, systemd services.</li>
+            <li><span class="font-semibold">AI:</span> LLM API integration (via n8n) with JSON-based contracts.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ARCHITECTURE IMAGE -->
+      <div class="mt-4">
+        <h3 class="font-semibold text-black mb-2">Architecture Diagram</h3>
+        <div class="w-full rounded-xl border-2 border-black overflow-hidden shadow-md">
+          <img
+            src="{% static 'moresore-fitness/more_sore_about_architecture.png' %}"
+            alt="MoreSore Fitness System Architecture"
+            class="w-full h-auto object-contain bg-gray-100"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- N8N / AI AGENT SECTION -->
+    <section class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-black mb-4">AI Agent &amp; n8n Workflow</h2>
+
+      <p class="text-gray-700 leading-relaxed mb-4">
+        The platform uses two, almost identical n8n-powered AI agent that handles both workout and meal generation.
+        Django sends a structured request to n8n, which calls the LLM, validates the response, and sends
+        clean JSON back into the app via a callback endpoint.
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <h3 class="font-semibold text-black mb-2">AI Agent Responsibilities</h3>
+          <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+            <li>Accepts natural language requests for workouts and meals from the chatbot.</li>
+            <li>Prompts the LLM to return strictly valid JSON with all required fields.</li>
+            <li>Normalizes units and types (numbers, dates, defaults) in a code node.</li>
+            <li>POSTs the structured data back to a Django callback URL.</li>
+            <li>Supports both workout templates and detailed meal/macros logging.</li>
+          </ul>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <h3 class="font-semibold text-black mb-2">Integration with Django</h3>
+          <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+            <li>Django serializers validate every field before saving to the database.</li>
+            <li>Workout data is split into workouts, exercises, and per-set details.</li>
+            <li>Meal data is stored as <code>MealEntry</code> objects linked to a <code>DailyLog</code>.</li>
+            <li>Failures or malformed responses are rejected instead of silently saved.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- N8N WORKFLOW IMAGE -->
+      <div class="mt-2">
+        <h3 class="font-semibold text-black mb-2">n8n Workflow</h3>
+        <div class="w-full rounded-xl border-2 border-black overflow-hidden shadow-md">
+          <img
+            src="{% static 'moresore-fitness/more_sore_about_n8n1.jpeg' %}"
+            alt="MoreSore Fitness n8n AI Agent Workflow"
+            class="w-full h-auto object-contain bg-gray-100"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- TECHNICAL BREAKDOWN -->
+    <section class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-black mb-4">Technical Breakdown</h2>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-semibold text-black mb-2">Backend &amp; Data Modeling</h3>
+          <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+            <li>Custom Django models for <span class="font-semibold">Exercise</span>, <span class="font-semibold">Workout</span>, <span class="font-semibold">WorkoutExercise</span>, <span class="font-semibold">MealEntry</span>, <span class="font-semibold">DailyLog</span>, and <span class="font-semibold">ExerciseProgress</span>.</li>
+            <li>Serializer classes that validate AI outputs and prevent malformed data from being saved.</li>
+            <li>Logic to compute volume, total sets, total reps, average weight, and estimated 1RM per exercise per day.</li>
+            <li>Daily logs aggregate meals and workouts with macro totals.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-black mb-2">Frontend</h3>
+          <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+            <li>Responsive dashboard built with Django templates and Tailwind CSS.</li>
+            <li>Chatbot section where users can talk to the AI to generate workouts or meals.</li>
+            <li>Workout preview editor that lets users adjust sets/reps/weights before saving.</li>
+            <li>Progress dashboard that groups performance by exercise across multiple sessions.</li>
+            <li>“Pictures” upload grid for visual progress tracking.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <h3 class="font-semibold text-black mb-2">Deployment &amp; DevOps</h3>
+        <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+          <li>DigitalOcean droplet running Ubuntu with firewall configured (UFW).</li>
+          <li>Gunicorn managed via systemd service, serving the Django application.</li>
+          <li>Nginx as reverse proxy using a Unix socket and custom site configuration.</li>
+          <li>Domain purchased via Squarespace with DNS pointing to the droplet.</li>
+          <li>App code versioned on GitHub, and deployed via <code>git pull</code> from the droplet.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- FUTURE VISION -->
+    <section id="future" class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-black mb-4">Future Work — Machine Learning &amp; Sensors</h2>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-semibold text-black mb-2">Custom Models on Real Training Data</h3>
+          <p class="text-gray-700 text-sm leading-relaxed">
+            As more users log workouts, I plan to build a dataset of anonymized exercise performance:
+            sets, reps, weights, rest, volume, and progress over time.
+            Using this data, I’ll train a simple model (e.g., via HuggingFace) that:
+          </p>
+          <ul class="list-disc list-inside text-gray-700 text-sm space-y-1 mt-2">
+            <li>Suggests optimal progression (weight increases, rep ranges) for each user.</li>
+            <li>Flags potential overtraining or under-recovery based on volume and intensity trends.</li>
+            <li>Provides “next best workout” recommendations tailored to recent performance.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="font-semibold text-black mb-2">Sensor-Driven Training Insights</h3>
+          <p class="text-gray-700 text-sm leading-relaxed">
+            Long-term, I want to integrate motion sensors (e.g., Apple Watch, custom IMU hardware) to:
+          </p>
+          <ul class="list-disc list-inside text-gray-700 text-sm space-y-1 mt-2">
+            <li>Detect eccentric vs concentric phases of each rep.</li>
+            <li>Measure time-under-tension and tempo consistency.</li>
+            <li>Identify dropsets, partial reps, and failure points automatically.</li>
+            <li>Score each set on “rep quality” instead of just counting reps.</li>
+          </ul>
+          <p class="text-gray-700 text-sm leading-relaxed mt-2">
+            This ties directly into my background in signals &amp; systems and my interest in combining
+            hardware, software, and AI into one feedback loop for athletes and lifters.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS GRID -->
+    <section class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-black mb-4">Skills &amp; Tools</h2>
+
+      <div class="grid md:grid-cols-4 gap-4 text-sm text-gray-800">
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <h3 class="font-semibold text-black mb-2">Languages</h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Python</li>
+            <li>Java</li>
+            <li>C++</li>
+            <li>JavaScript</li>
+          </ul>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <h3 class="font-semibold text-black mb-2">Web &amp; Backend</h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Django &amp; DRF</li>
+            <li>REST API design</li>
+            <li>Auth &amp; sessions</li>
+            <li>ORM modeling</li>
+            <li>Template rendering</li>
+          </ul>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <h3 class="font-semibold text-black mb-2">DevOps &amp; Infra</h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>DigitalOcean droplet</li>
+            <li>Gunicorn &amp; systemd</li>
+            <li>Nginx reverse proxy</li>
+            <li>Linux server management</li>
+            <li>Git &amp; GitHub</li>
+          </ul>
+        </div>
+
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <h3 class="font-semibold text-black mb-2">AI &amp; Automation</h3>
+          <ul class="list-disc list-inside space-y-1">
+            <li>n8n workflow automation</li>
+            <li>LLM API integration</li>
+            <li>Prompt &amp; JSON contract design</li>
+            <li>Data validation &amp; sanitization</li>
+            <li>Future: HuggingFace model training</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="bg-white border-2 border-black rounded-xl shadow-lg p-6">
+      <h2 class="text-2xl font-bold text-black mb-4">Contact &amp; Links</h2>
+      <p class="text-gray-700 mb-4">
+        I’m actively looking for internships and roles where I can work on backend systems,
+        AI-driven products, or tools at the intersection of hardware and software.
+      </p>
+
+      <div class="space-y-2 text-gray-800">
+        <p><span class="font-semibold">Email:</span> <span class="text-gray-700">noahk23@vt.edu</span></p>
+        <p><span class="font-semibold">LinkedIn:</span> <span class="text-gray-700">www.linkedin.com/in/noah-knauf-903701315</span></p>
+        <p><span class="font-semibold">GitHub:</span> <span class="text-gray-700">github.com/noahk</span></p>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>
