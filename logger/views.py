@@ -208,6 +208,10 @@ def create_meal_from_agent(request):
                 date=meal.date
             )
             daily_log.meals.add(meal)
+            daily_log.total_calories += meal.calories
+            daily_log.total_protein += meal.protein
+            daily_log.total_carbs += meal.carbs
+            daily_log.total_fats += meal.fats
             daily_log.save()
             meal_serialized = MealEntrySerializer(meal)
             return Response({'message': 'Meal created successfully'}, status=201)
